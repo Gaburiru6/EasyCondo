@@ -1,0 +1,38 @@
+from sqlalchemy.orm import Session
+from app.models.user import User
+
+
+def listar(db: Session):
+    return db.query(User).filter(User.status == "PENDENTE").all()
+
+
+def aprovar(db: Session, id: int):
+    user = db.query(User).get(id)
+
+    if not user:
+        raise Exception("Usuário não encontrado")
+
+    if user.status != "PENDENTE":
+        raise Exception("Usuário já processado")
+
+    user.status = "APROVADO"
+
+    db.commit()
+
+    return {"msg": "Usuário aprovado"}
+
+
+def negar(db: Session, id: int):
+    user = db.query(User).get(id)
+
+    if not user:
+        raise Exception("Usuário não encontrado")
+
+    if user.status != "PENDENTE":
+        raise Exception("Usuário já processado")
+
+    user.status = "NEGADO"
+
+    db.commit()
+
+    return {"msg": "Usuário negado"}
