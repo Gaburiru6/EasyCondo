@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 from app.models.user import User
 
 
@@ -7,32 +8,30 @@ def listar(db: Session):
 
 
 def aprovar(db: Session, id: int):
-    user = db.query(User).get(id)
+    user = db.get(User, id)
 
     if not user:
-        raise Exception("Usuário não encontrado")
+        raise HTTPException(404, "Usuário não encontrado")
 
     if user.status != "PENDENTE":
-        raise Exception("Usuário já processado")
+        raise HTTPException(400, "Usuário já processado")
 
     user.status = "APROVADO"
-
     db.commit()
 
     return {"msg": "Usuário aprovado"}
 
 
 def negar(db: Session, id: int):
-    user = db.query(User).get(id)
+    user = db.get(User, id)
 
     if not user:
-        raise Exception("Usuário não encontrado")
+        raise HTTPException(404, "Usuário não encontrado")
 
     if user.status != "PENDENTE":
-        raise Exception("Usuário já processado")
+        raise HTTPException(400, "Usuário já processado")
 
     user.status = "NEGADO"
-
     db.commit()
 
     return {"msg": "Usuário negado"}
