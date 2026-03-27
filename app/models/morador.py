@@ -1,8 +1,8 @@
-from typing import Optional
-from datetime import date
-from usuario import Usuario
-from statusUsuario import StatusUsuario
+from sqlalchemy import Column, Integer, Date, Enum, ForeignKey
+from app.db.session import Base
 
-class Morador(Usuario):
-    dataAprovacao: Optional[date] = None
-    status: StatusUsuario
+class Morador(Base):
+    __tablename__ = "moradores"
+
+    id = Column(Integer, ForeignKey("usuarios.id"), primary_key=True)
+    data_aprovacao = Column(Date, nullable=True)
