@@ -1,0 +1,70 @@
+/* Reset e Base */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+body {
+    background-color: #f1f5f9;
+    background-image: radial-gradient(#cbd5e1 0.8px, transparent 0.8px);
+    background-size: 24px 24px;
+    color: #1e293b;
+    padding-bottom: 40px;
+}
+
+/* Navbar */
+.navbar { background: white; padding: 15px 0; border-bottom: 1px solid #e2e8f0; }
+.nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+.brand { font-weight: 700; font-size: 18px; }
+.nav-links a { text-decoration: none; color: #64748b; margin: 0 15px; font-size: 14px; }
+.nav-links a.active { color: #0f172a; font-weight: 600; }
+.nav-icons { display: flex; gap: 15px; align-items: center; }
+.user-pill { background: #fee2e2; padding: 5px; border-radius: 6px; }
+
+/* Container do Dashboard */
+.main-content { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+.content-card { background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+
+.welcome-section { margin-bottom: 40px; }
+.welcome-section h1 { font-size: 28px; color: #0f172a; }
+.welcome-section p { color: #64748b; font-size: 14px; margin-top: 5px; }
+
+/* Avisos */
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.section-header h2 { font-size: 16px; color: #0f172a; }
+.view-all { font-size: 11px; font-weight: 700; color: #64748b; text-decoration: none; letter-spacing: 0.5px; }
+
+.announcement-item { background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #f1f5f9; }
+.ann-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+.date { font-size: 11px; font-weight: 600; color: #94a3b8; }
+.badge { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 4px; color: white; }
+.badge.maintenance { background: #1e293b; }
+.badge.social { background: #64748b; }
+.announcement-item h3 { font-size: 15px; margin-bottom: 5px; }
+.announcement-item p { font-size: 13px; color: #64748b; }
+
+/* Grid Reservas */
+.reservations-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px; }
+.res-box h3 { font-size: 16px; margin-bottom: 20px; }
+
+.res-card.active { border-left: 4px solid #0f172a; background: #f8fafc; padding: 20px; border-radius: 4px; }
+.res-date { font-size: 10px; font-weight: 700; color: #64748b; }
+.res-card h4 { margin: 5px 0; font-size: 15px; }
+.res-time { font-size: 12px; color: #94a3b8; }
+
+.history-item { display: flex; align-items: center; padding: 15px; background: #f8fafc; border-radius: 8px; margin-bottom: 10px; }
+.history-icon { width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; }
+.history-info h4 { font-size: 14px; }
+.history-info p { font-size: 11px; color: #94a3b8; }
+.arrow { margin-left: auto; color: #cbd5e1; font-size: 20px; }
+
+/* Rodapé de Ações */
+.actions-footer { margin-top: 50px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 30px; }
+.btns { display: flex; gap: 15px; }
+.btn-navy { background: #0f172a; color: white; border: none; padding: 12px 25px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+.btn-gray { background: #e2e8f0; color: #1e293b; border: none; padding: 12px 25px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+.support-info { font-size: 12px; color: #64748b; }
+
+/* Mobile */
+@media (max-width: 768px) {
+    .reservations-grid { grid-template-columns: 1fr; }
+    .navbar .nav-links { display: none; }
+    .actions-footer { flex-direction: column; gap: 20px; text-align: center; }
+}

@@ -1,0 +1,115 @@
+/* Configurações Globais */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+body {
+    background-color: #f8fafc; /* Fundo cinza bem claro */
+    background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px); /* Efeito pontilhado */
+    background-size: 24px 24px;
+    color: #0f172a;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.top-nav {
+    background: white;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.logo { font-weight: 700; font-size: 18px; color: #0f172a; }
+
+.user-section { display: flex; align-items: center; gap: 15px; }
+
+.profile-info { text-align: right; line-height: 1.2; }
+.profile-info strong { display: block; font-size: 13px; color: #1e293b; }
+.profile-info span { font-size: 11px; color: #64748b; }
+
+.avatar { 
+    width: 35px; height: 35px; background: #f1f5f9; border-radius: 50%; 
+    display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;
+}
+
+.logout { cursor: pointer; color: #64748b; font-size: 18px; }
+
+/* Container Principal */
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.white-card {
+    background: white;
+    width: 100%;
+    max-width: 1000px;
+    padding: 60px 40px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    text-align: center;
+}
+
+h1 { font-size: 32px; margin-bottom: 50px; color: #0f172a; }
+
+/* Grid de Módulos */
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 colunas no desktop */
+    gap: 20px;
+}
+
+.module {
+    background: #f8fafc;
+    padding: 35px 20px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.module:hover {
+    background: #f1f5f9;
+    transform: translateY(-3px);
+}
+
+.icon-circle {
+    width: 50px; height: 50px; background: white; border-radius: 50%;
+    margin: 0 auto 15px; display: flex; align-items: center; 
+    justify-content: center; font-size: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.module h3 { font-size: 16px; color: #0f172a; margin-bottom: 8px; }
+.module p { font-size: 13px; color: #64748b; }
+
+/* Ajuste para as últimas 2 caixas centralizarem se houver 5 itens */
+.module:nth-child(4), .module:nth-child(5) {
+    /* Opcional: estilização específica */
+}
+
+/* Footer */
+.footer {
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.footer-right a {
+    text-decoration: none;
+    color: #64748b;
+    margin-left: 20px;
+}
+
+/* Responsividade para Celular */
+@media (max-width: 768px) {
+    .modules-grid { grid-template-columns: 1fr; }
+    .top-nav { padding: 15px 20px; }
+    .profile-info { display: none; }
+}
