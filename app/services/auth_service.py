@@ -27,9 +27,9 @@ def login(db: Session, email: str, senha: str):
     user = db.query(User).filter(User.email == email).first()
 
     if not user or user.senha != senha:
-        raise Exception("Credenciais inválidas")
+        raise HTTPException(status_code=400, detail="Credenciais inválidas")
 
     if user.status != StatusUsuario.aprovado:
-        raise Exception("Usuário ainda não aprovado")
+        raise HTTPException(status_code=403, detail="Usuário não aprovado")
 
     return {"msg": "Login realizado", "user_id": user.id}

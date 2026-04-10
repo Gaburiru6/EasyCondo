@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Morador</title>
+    <link rel="stylesheet" href="/static/css/morador.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Bem-vindo, {{ nome }}</h2>
+
+    <div class="content">
+
+        <!-- 🔹 ESQUERDA -->
+        <div class="left">
+
+            <h3>Fazer Reserva</h3>
+
+            <form id="reservaForm">
+
+                <label>Área</label>
+                <select id="area">
+                    <option value="">Selecione</option>
+                    <!-- vai vir do backend futuramente -->
+                    <option value="1">Churrasqueira (R$50)</option>
+                    <option value="2">Salão (Grátis)</option>
+                </select>
+
+                <label>Data</label>
+                <input type="date" id="data" required>
+
+                <label>Horário Início</label>
+                <input type="time" id="inicio" required>
+
+                <label>Horário Fim</label>
+                <input type="time" id="fim" required>
+
+                <button type="submit">Reservar</button>
+
+            </form>
+
+            <p id="infoArea"></p>
+
+        </div>
+
+        <!-- 🔹 DIREITA -->
+        <div class="right">
+
+            <h3>Minhas Reservas</h3>
+
+            <div id="minhasReservas">
+
+                <!-- Exemplo -->
+                <div class="reserva">
+                    <p>Churrasqueira - 10/04 - 18:00 às 22:00</p>
+
+                    <button onclick="editar()">Editar</button>
+                    <button onclick="cancelar()">Cancelar</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/static/js/morador.js"></script>
+</body>
+</html>
