@@ -1,74 +1,346 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área do Morador</title>
-    <link rel="stylesheet" href="/static/css/morador.css">
+
+<html lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EasyCondo - Reservas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed-variant": "#003dab",
+                    "inverse-on-surface": "#f0f1f2",
+                    "surface-container-high": "#e7e8e9",
+                    "on-surface-variant": "#434654",
+                    "on-tertiary-container": "#ffd4c5",
+                    "inverse-surface": "#2e3132",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#dbe1ff",
+                    "inverse-primary": "#b5c4ff",
+                    "primary-fixed-dim": "#b5c4ff",
+                    "on-secondary-container": "#3d4e84",
+                    "on-primary-fixed": "#00174d",
+                    "on-secondary-fixed-variant": "#334479",
+                    "secondary-container": "#b1c2ff",
+                    "error": "#ba1a1a",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#ffb59a",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#e1e3e4",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#4b5c92",
+                    "on-secondary-fixed": "#01174b",
+                    "on-tertiary-fixed": "#380d00",
+                    "surface-bright": "#f8f9fa",
+                    "surface-dim": "#d9dadb",
+                    "outline": "#737686",
+                    "on-tertiary-fixed-variant": "#802a00",
+                    "surface-variant": "#e1e3e4",
+                    "surface-tint": "#1353d8",
+                    "outline-variant": "#c3c5d7",
+                    "tertiary-fixed": "#ffdbcf",
+                    "surface-container": "#edeeef",
+                    "on-primary-container": "#d4dcff",
+                    "primary-container": "#1a56db",
+                    "tertiary": "#852b00",
+                    "secondary-fixed": "#dbe1ff",
+                    "tertiary-container": "#ad3b00",
+                    "surface": "#f8f9fa",
+                    "secondary-fixed-dim": "#b5c4ff",
+                    "on-surface": "#191c1d",
+                    "background": "#f8f9fa",
+                    "surface-container-low": "#f3f4f5",
+                    "on-error": "#ffffff",
+                    "on-background": "#191c1d",
+                    "error-container": "#ffdad6",
+                    "primary": "#003fb1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-manrope { font-family: 'Manrope', sans-serif; }
+    </style>
 </head>
-<body>
+<body class="bg-surface text-on-surface flex min-h-screen">
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden lg:flex flex-col p-4 gap-2 bg-slate-50 dark:bg-slate-950 h-screen w-64 fixed left-0 top-0 z-40">
+<div class="px-4 py-6 mb-4">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary">apartment</span>
+</div>
+<div>
+<h1 class="text-lg font-black text-blue-700 dark:text-blue-400 leading-none">Portal</h1>
+<p class="text-xs text-slate-500 font-manrope">Residencial</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 font-manrope text-sm font-semibold hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Home
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 rounded-lg shadow-sm font-manrope text-sm font-semibold" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+                Reservas
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 font-manrope text-sm font-semibold hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
+                Suporte
+            </a>
+</nav>
 
-<div class="container">
-
-    <h2>Bem-vindo, {{ nome }}</h2>
-
-    <div class="content">
-
-        <!-- 🔹 ESQUERDA -->
-        <div class="left">
-
-            <h3>Fazer Reserva</h3>
-
-            <form id="reservaForm">
-
-                <label>Área</label>
-                <select id="area">
-                    <option value="">Selecione</option>
-                    <!-- vai vir do backend futuramente -->
-                    <option value="1">Churrasqueira (R$50)</option>
-                    <option value="2">Salão (Grátis)</option>
-                </select>
-
-                <label>Data</label>
-                <input type="date" id="data" required>
-
-                <label>Horário Início</label>
-                <input type="time" id="inicio" required>
-
-                <label>Horário Fim</label>
-                <input type="time" id="fim" required>
-
-                <button type="submit">Reservar</button>
-
-            </form>
-
-            <p id="infoArea"></p>
-
-        </div>
-
-        <!-- 🔹 DIREITA -->
-        <div class="right">
-
-            <h3>Minhas Reservas</h3>
-
-            <div id="minhasReservas">
-
-                <!-- Exemplo -->
-                <div class="reserva">
-                    <p>Churrasqueira - 10/04 - 18:00 às 22:00</p>
-
-                    <button onclick="editar()">Editar</button>
-                    <button onclick="cancelar()">Cancelar</button>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
+</aside>
+<!-- Main Wrapper -->
+<div class="flex-1 lg:ml-64 flex flex-col">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl h-16 border-b border-slate-100/50 dark:border-slate-800/50">
+<div class="flex justify-between items-center px-8 h-full w-full max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-blue-700 dark:text-blue-400 font-manrope">EasyCondo</span>
+<nav class="hidden md:flex gap-6">
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm w-64 focus:ring-2 focus:ring-primary/20" placeholder="Search facilities..." type="text"/>
+</div>
+<button class="text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-slate-200">
+<img alt="Resident Profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional man in his 30s with a warm smile and modern eyeglasses against a neutral studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGjtlytDtJ827J1Jj3Q2B3kVf693IfEjtdzr0DHGyE9YDHyd530gur8MfcUa1CJe_meCNhyRq7xCmW-sP_p9HG43bckiCBz33U9-Bt8lq_pldByWGzvZueDZHovh3T1s4K67IzCDX3y_TRcmqRlC3uvce8wYcVGDCjjquvxFB4HM9mjqf8Ac1MAZq1fvCCaFWA-S1caB6SR5hpj0LkgEeytpiGOXTmte-7bpAU3PRdJiE6z-k5WB9OBy-BZH_QGslKnUzJNDQji0nq"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<main class="mt-16 p-6 lg:p-10 max-w-screen-2xl mx-auto w-full">
+<div class="mb-8">
+<h2 class="text-3xl font-extrabold font-manrope tracking-tight text-on-surface">Reservas</h2>
+<p class="text-on-surface-variant">Agende espaços comuns e gerencie seu tempo no EasyCondo.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Form -->
+<section class="lg:col-span-5">
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-[0_12px_40px_rgba(25,28,29,0.05)] border border-outline-variant/15">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="calendar_add_on">calendar_add_on</span>
+<h3 class="text-xl font-bold font-manrope text-on-surface">Fazer Reserva</h3>
+</div>
+<form class="space-y-5">
+<div>
+<label class="block text-sm font-semibold text-on-surface-variant mb-1.5 ml-1">Área</label>
+<select class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/40 transition-all font-body">
+<option>Selecione uma área</option>
+<option>Salão de Festas</option>
+<option>Churrasqueira A</option>
+<option>Quadra de Tênis</option>
+<option>Espaço Gourmet</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-semibold text-on-surface-variant mb-1.5 ml-1">Data</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">calendar_today</span>
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/40 transition-all font-body" type="date"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-semibold text-on-surface-variant mb-1.5 ml-1">Horário Início</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/40 transition-all font-body" type="time"/>
+</div>
+<div>
+<label class="block text-sm font-semibold text-on-surface-variant mb-1.5 ml-1">Horário Fim</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/40 transition-all font-body" type="time"/>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold rounded-lg shadow-sm hover:opacity-90 active:scale-[0.98] transition-all" type="submit">
+                                    Reservar
+                                </button>
+</div>
+</form>
+</div>
+<!-- Visual Context Card -->
+<div class="mt-6 bg-surface-container-low rounded-xl p-4 overflow-hidden relative group">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20 transition-opacity duration-500 group-hover:opacity-30" data-alt="luxury condominium swimming pool area at night with elegant blue lighting, calm water reflecting surrounding modern architecture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEB4URDM8nBtsxwYAtYxMfPV9yXmGGTXsV2BcQkI__KElqbVdtLaYTGuN6l8y4J1kYsR0TuWvFGVZE3xS8w2KdNwFpfUAXw7GPRBXYb0fnFoApm6xsaSRHlBjh_C7whiyxopDwr7szCmHhQaABjeTfyTGaUZoC0-pNTYc-Y5hG7q-n483aHupntDJZCeCGQVRJNOXdZbQ-2WA_tlkCfDoavQE455e8cO6sJAstFuBchVCcw9-U2TAC5rgF3tpSfDowGG3BVJreII_-"/>
+<div class="relative z-10">
+<h4 class="text-sm font-bold text-primary mb-1">Dica do Concierge</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Reserve o Salão de Festas com pelo menos 15 dias de antecedência para garantir sua data preferida.</p>
+</div>
+</div>
+</section>
+<!-- Right Column: List -->
+<section class="lg:col-span-7">
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_12px_40px_rgba(25,28,29,0.05)] border border-outline-variant/15 flex flex-col h-full">
+<div class="p-8 border-b border-surface-container-high bg-surface-container-low/30 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="list_alt">list_alt</span>
+<h3 class="text-xl font-bold font-manrope text-on-surface">Minhas Reservas</h3>
+</div>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">3 Agendadas</span>
+</div>
+<div class="p-2">
+<!-- Reservation Item -->
+<div class="p-6 rounded-lg hover:bg-surface-container-low transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="restaurant">restaurant</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Espaço Gourmet</h4>
+<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-on-surface-variant mt-1">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                                                12 de Outubro, 2023
+                                            </span>
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                                19:00 - 23:00
+                                            </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container-high rounded-lg transition-colors">Editar</button>
+<button class="px-4 py-2 text-sm font-semibold text-error hover:bg-error-container/20 rounded-lg transition-colors">Cancelar</button>
+</div>
+</div>
+<!-- Reservation Item -->
+<div class="p-6 rounded-lg hover:bg-surface-container-low transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-tertiary-fixed-dim/30 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-tertiary" data-icon="sports_tennis">sports_tennis</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Quadra de Tênis</h4>
+<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-on-surface-variant mt-1">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                                                15 de Outubro, 2023
+                                            </span>
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                                08:00 - 09:30
+                                            </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container-high rounded-lg transition-colors">Editar</button>
+<button class="px-4 py-2 text-sm font-semibold text-error hover:bg-error-container/20 rounded-lg transition-colors">Cancelar</button>
+</div>
+</div>
+<!-- Reservation Item -->
+<div class="p-6 rounded-lg hover:bg-surface-container-low transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="celebration">celebration</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Salão de Festas</h4>
+<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-on-surface-variant mt-1">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                                                24 de Dezembro, 2023
+                                            </span>
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                                18:00 - 02:00
+                                            </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container-high rounded-lg transition-colors">Editar</button>
+<button class="px-4 py-2 text-sm font-semibold text-error hover:bg-error-container/20 rounded-lg transition-colors">Cancelar</button>
+</div>
+</div>
+</div>
+<div class="mt-auto p-6 bg-surface-container-low/20 text-center">
+<button class="text-sm font-bold text-slate-500 hover:text-primary flex items-center justify-center gap-2 mx-auto transition-colors">
+                                Ver histórico completo
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile) -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 flex justify-around items-center h-16 z-50">
+<button class="flex flex-col items-center gap-0.5 text-slate-400">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-semibold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-blue-700">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span class="text-[10px] font-semibold">Reservas</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-slate-400">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="text-[10px] font-semibold">Suporte</span>
+</button>
 </div>
 
-<script src="/static/js/morador.js"></script>
-</body>
-</html>
+<script>
+document.getElementById("registerForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const nome = document.getElementById("nome").value;
+    const email = document.getElementById("email").value;
+    const senha = document.getElementById("senha").value;
+
+    const response = await fetch("/auth/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            nome,
+            email,
+            senha
+        })
+    });
+
+    if (response.ok) {
+        window.location.href = "/login";
+    } else {
+        alert("Erro ao cadastrar");
+    }
+});
+</script>
+
+</body></html>
