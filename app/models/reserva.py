@@ -10,7 +10,7 @@ class Reserva(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    area_id = Column(Integer, ForeignKey("areas.id"))
+    area_id = Column(Integer, ForeignKey("area.id"))
     morador_id = Column(Integer, ForeignKey("moradores.id"))
 
     data_reserva = Column(Date)

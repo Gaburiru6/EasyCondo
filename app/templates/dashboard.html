@@ -28,25 +28,15 @@
         <!-- 🔹 ESQUERDA -->
         <div class="left">
 
-            <h3>Cadastrar Área</h3>
-
-            <form id="areaForm">
-                <input type="text" placeholder="Nome" id="nome" required>
-                <input type="text" placeholder="Descrição" id="descricao">
-
-                <input type="number" placeholder="Taxa (opcional)" id="taxa">
-                <label><input type="checkbox" id="possui_taxa"> Possui taxa</label>
-
-                <input type="number" placeholder="Antecedência (horas)" id="antecedencia">
-
-                <input type="number" placeholder="Limite semanal" id="limite_semanal">
-                <input type="number" placeholder="Limite mensal" id="limite_mensal">
-
-                <input type="number" placeholder="Tempo desistência (h)" id="desistencia">
-
-                <button type="submit">Cadastrar</button>
-            </form>
-
+            <div class="cards">
+                <div class="card">
+                    <h3>Configurações</h3>
+                    <button onclick="window.location.href='/area'" style="margin-top: 10px; background-color: #1a56db; color: white; padding: 10px; border-radius: 8px; width: 100%;">
+                        Gerenciar Áreas
+                    </button>
+                </div>
+            </div>
+            
         </div>
 
         <!-- 🔹 DIREITA -->

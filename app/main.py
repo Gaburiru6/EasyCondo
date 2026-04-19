@@ -4,9 +4,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 import os
 
-from app.api.routes import auth, solicitacao
+from app.api.routes import auth, solicitacao, area, reserva
 from app.db.session import engine, Base
-from app.models import usuario, morador, sindico, area, reserva
 
 app = FastAPI()
 
@@ -24,6 +23,8 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(auth.router)
 app.include_router(solicitacao.router)
+app.include_router(area.router)
+app.include_router(reserva.router)
 
 from fastapi import Request
 
@@ -62,4 +63,12 @@ def morador_page(request: Request, nome: str = "Usuário"):
         request=request,
         name="morador.html",
         context={"nome": nome}
+    )
+
+@app.get("/area")
+def area_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="area.html",
+        context={}
     )
