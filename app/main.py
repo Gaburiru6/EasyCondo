@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 import os
 
-from app.api.routes import auth, solicitacao, area, reserva
+from app.api.routes import auth, solicitacao, area, reserva, dashboard
 from app.db.session import engine, Base
 
 app = FastAPI()
@@ -25,6 +25,7 @@ app.include_router(auth.router)
 app.include_router(solicitacao.router)
 app.include_router(area.router)
 app.include_router(reserva.router)
+app.include_router(dashboard.router)
 
 from fastapi import Request
 
@@ -56,6 +57,7 @@ def dashboard(request: Request):
         name="dashboard.html",
         context={}
     )
+
 
 @app.get("/morador")
 def morador_page(request: Request, nome: str = "Usuário"):

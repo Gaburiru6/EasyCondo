@@ -135,6 +135,8 @@
 <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">Por motivos de segurança, todas as novas contas de residentes devem ser aprovadas manualmente pelo administrador do prédio antes de receberem acesso.</p>
 </div>
 </div>
+<div id="errorBox" style="display:none;margin-bottom:10px;padding:10px;border:1px solid #f5c2c7;background:#f8d7da;color:#842029;border-radius:8px;"></div>
+<div id="successBox" style="display:none;margin-bottom:10px;padding:10px;border:1px solid #badbcc;background:#d1e7dd;color:#0f5132;border-radius:8px;"></div>
 <form class="space-y-5" id="registerForm">
 <div>
 <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-2 ml-1" for="nome">NOME COMPLETO</label>
@@ -193,6 +195,23 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const nome = document.getElementById("nome").value;
     const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
+    const confirm = document.getElementById("confirm").value;
+    const apartamento = document.getElementById("unit").value;
+
+    if (!nome || !email || !senha || !confirm || !apartamento) {
+    showError("Preencha todos os campos.");
+    return;
+}
+
+if (senha.length < 6) {
+    showError("A senha deve ter pelo menos 6 caracteres.");
+    return;
+}
+
+if (senha !== confirm) {
+    showError("As senhas não coincidem.");
+    return;
+}
 
     const response = await fetch("/auth/register", {
         method: "POST",
@@ -202,16 +221,50 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         body: JSON.stringify({
             nome,
             email,
-            senha
+            senha,
+            confirmar_senha: confirm,
+            apartamento
         })
     });
 
     if (response.ok) {
         window.location.href = "/login";
     } else {
-        alert("Erro ao cadastrar");
+    const data = await response.json().catch(() => null);
+    
+    if (data?.detail === "EMAIL_EXISTS") {
+        showError("Este email já está cadastrado.");
+    } 
+    else if (data?.detail === "MISSING_FIELDS") {
+        showError("Preencha todos os campos.");
+    } else if (senha.length < 6) {
+    showError("A senha deve ter pelo menos 6 caracteres.");
+    } else if(senha !== confirm) {
+    showError("As senhas não coincidem.");
+    } else {
+        showError("Erro ao cadastrar.");
     }
+}
 });
+
+function showError(msg){
+    const box = document.getElementById("errorBox");
+    const ok = document.getElementById("successBox");
+
+    ok.style.display = "none";
+    box.style.display = "block";
+    box.innerText = msg;
+}
+
+function showSuccess(msg){
+    const box = document.getElementById("successBox");
+    const err = document.getElementById("errorBox");
+
+    err.style.display = "none";
+    box.style.display = "block";
+    box.innerText = msg;
+}
+
 </script>
 
 </body></html>

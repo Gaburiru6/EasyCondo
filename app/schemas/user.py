@@ -4,6 +4,7 @@ class UserResponse(BaseModel):
     id: int
     nome: str
     email: str
+    apartamento: str
     status: str
 
     class Config:

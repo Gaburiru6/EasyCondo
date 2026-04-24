@@ -171,6 +171,11 @@
                         Login para o portal
                     </button>
 </form>
+<div id="errorBox"
+     style="display:none;margin-bottom:10px;padding:10px;
+     border:1px solid #f5c2c7;background:#f8d7da;
+     color:#842029;border-radius:8px;">
+</div>
 <!-- Divider -->
 <div class="relative my-8">
 <div class="absolute inset-0 flex items-center">
@@ -222,7 +227,27 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         // 🔥 redireciona para tua rota FastAPI
         window.location.href = "/morador";
     } else {
-        alert("Email ou senha inválidos");
+        const data = await response.json().catch(() => null);
+
+    if (data?.detail === "EMAIL_NOT_FOUND") {
+        showError("Email não existente.");
+    }
+    else if (data?.detail === "USER_NOT_APPROVED") {
+        showError("Email ainda não foi aprovado.");
+    }
+    else if (data?.detail === "INVALID_CREDENTIALS") {
+        showError("Senha incorreta.");
+    }
+    else {
+        showError("Erro ao fazer login.");
+    }
     }
 });
+
+function showError(msg){
+    const box = document.getElementById("errorBox");
+    box.style.display = "block";
+    box.innerText = msg;
+}
+
 </script>
