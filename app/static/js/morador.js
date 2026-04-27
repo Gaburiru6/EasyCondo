@@ -29,6 +29,7 @@ function showToast(message, type = "success") {
 // ==========================================
 const MORADOR_ID_SIMULADO = 1;
 let areasCache = {}; 
+let reservasCache = {}; // Novo cache para as reservas
 
 async function carregarAreasNoSelect() {
     try {
@@ -65,6 +66,8 @@ async function carregarMinhasReservas() {
         if (!container) return;
 
         container.innerHTML = "";
+        reservasCache = {}; // Limpa o cache a cada carregamento
+
         if (contador) contador.innerText = `${reservas.length} Agendadas`;
 
         if (reservas.length === 0) {
@@ -73,6 +76,8 @@ async function carregarMinhasReservas() {
         }
 
         reservas.forEach(r => {
+            reservasCache[r.id] = r; // Salva a reserva no cache para edição
+
             const areaInfo = areasCache[r.area_id];
             const nomeArea = areaInfo ? areaInfo.nome : `Área Desconhecida (ID: ${r.area_id})`;
 
@@ -96,7 +101,8 @@ async function carregarMinhasReservas() {
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-4">
+                        <button onclick="editarReserva(${r.id})" class="text-blue-600 hover:text-blue-800 font-bold text-sm transition">Editar</button>
                         <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">${r.status}</span>
                     </div>
                 </div>
@@ -107,6 +113,60 @@ async function carregarMinhasReservas() {
     }
 }
 
+// ==========================================
+// FUNÇÕES DE EDIÇÃO
+// ==========================================
+function editarReserva(id) {
+    const r = reservasCache[id];
+    if (!r) return;
+
+    // Preenche os campos do formulário
+    const inputReservaId = document.getElementById("reserva_id");
+    if(inputReservaId) inputReservaId.value = r.id;
+
+    document.getElementById("area").value = r.area_id;
+    document.getElementById("data").value = r.data_reserva;
+    document.getElementById("inicio").value = r.horario_inicio.substring(0, 5); // Ex: "10:00:00" -> "10:00"
+    document.getElementById("fim").value = r.horario_fim.substring(0, 5);
+
+    // Ajusta os botões visuais
+    const btnSalvar = document.getElementById("btnSalvar");
+    const btnCancelar = document.getElementById("btnCancelar");
+
+    if (btnSalvar) {
+        btnSalvar.innerText = "Atualizar Reserva";
+        btnSalvar.classList.replace("w-full", "w-2/3");
+    }
+    if (btnCancelar) {
+        btnCancelar.classList.remove("hidden");
+    }
+    
+    // Rola a tela suavemente para o topo onde está o formulário
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelarEdicao() {
+    const form = document.getElementById("reservaForm");
+    if(form) form.reset();
+
+    const inputReservaId = document.getElementById("reserva_id");
+    if(inputReservaId) inputReservaId.value = "";
+
+    const btnSalvar = document.getElementById("btnSalvar");
+    const btnCancelar = document.getElementById("btnCancelar");
+
+    if (btnSalvar) {
+        btnSalvar.innerText = "Confirmar Reserva";
+        btnSalvar.classList.replace("w-2/3", "w-full");
+    }
+    if (btnCancelar) {
+        btnCancelar.classList.add("hidden");
+    }
+}
+
+// ==========================================
+// SUBMISSÃO DO FORMULÁRIO (CRIAÇÃO/EDIÇÃO)
+// ==========================================
 const form = document.getElementById("reservaForm");
 if (form) {
     form.addEventListener("submit", async (e) => {
@@ -118,30 +178,43 @@ if (form) {
             return;
         }
 
+        const inputReservaId = document.getElementById("reserva_id");
+        const reservaId = inputReservaId ? inputReservaId.value : "";
+
+        // O backend (FastAPI/Time) exige formato HH:MM:SS. Se o input devolver HH:MM, adicionamos os segundos
+        let hor_inicio = document.getElementById("inicio").value;
+        let hor_fim = document.getElementById("fim").value;
+        if (hor_inicio.length === 5) hor_inicio += ":00";
+        if (hor_fim.length === 5) hor_fim += ":00";
+
         const data = {
             area_id: parseInt(areaId),
             morador_id: MORADOR_ID_SIMULADO,
             data_reserva: document.getElementById("data").value,
-            horario_inicio: document.getElementById("inicio").value + ":00", 
-            horario_fim: document.getElementById("fim").value + ":00",
+            horario_inicio: hor_inicio, 
+            horario_fim: hor_fim,
             status: "CONFIRMADA", 
             valor_pago: 0.0 
         };
 
+        // Define a rota e o método HTTP dependendo se estamos criando ou editando
+        const url = reservaId ? `/api/reserva/${reservaId}` : "/api/reserva/";
+        const method = reservaId ? "PUT" : "POST";
+
         try {
-            const res = await fetch("/api/reserva/", {
-                method: "POST",
+            const res = await fetch(url, {
+                method: method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
             });
 
             if (res.ok) {
-                showToast("Reserva confirmada com sucesso!", "success");
-                form.reset();
+                showToast(reservaId ? "Reserva atualizada com sucesso!" : "Reserva confirmada com sucesso!", "success");
+                cancelarEdicao(); // Limpa e restaura a visualização do formulário
                 carregarMinhasReservas();
             } else {
                 const erro = await res.json();
-                showToast("Erro ao reservar: " + (erro.detail || "Verifique os dados"), "error");
+                showToast("Erro ao processar: " + (erro.detail || "Verifique os dados"), "error");
             }
         } catch (error) {
             showToast("Erro de comunicação com o servidor.", "error");
@@ -149,4 +222,5 @@ if (form) {
     });
 }
 
+// Inicia a aplicação carregando os dados
 carregarAreasNoSelect();

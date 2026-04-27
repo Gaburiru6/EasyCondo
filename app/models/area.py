@@ -13,4 +13,5 @@ class Area(Base):
     limite_semanal = Column(Integer)
     limite_mensal = Column(Integer)
     tempo_maximo_desistencia_horas = Column(Integer)
+    limite_cancelamento_edicao_dias = Column(Integer, default=0)
     ativo = Column(Boolean, default=True)

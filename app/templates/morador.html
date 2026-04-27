@@ -115,8 +115,13 @@
                                     <input id="fim" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary/40" type="time" required />
                                 </div>
                             </div>
-                            <div class="pt-4">
-                                <button type="submit" class="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold rounded-lg hover:opacity-90 transition-all">
+                            <input type="hidden" id="reserva_id" value="">
+
+                            <div class="flex gap-2 pt-4">
+                                <button type="button" id="btnCancelar" onclick="cancelarEdicao()" class="hidden w-1/3 bg-slate-200 text-slate-700 py-4 font-bold rounded-lg hover:bg-slate-300 transition-all">
+                                    Cancelar
+                                </button>
+                                <button type="submit" id="btnSalvar" class="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold rounded-lg hover:opacity-90 transition-all">
                                     Confirmar Reserva
                                 </button>
                             </div>

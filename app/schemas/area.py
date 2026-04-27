@@ -10,6 +10,7 @@ class AreaBase(BaseModel):
     limite_semanal: int = 0
     limite_mensal: int = 0
     tempo_maximo_desistencia_horas: int = 0
+    limite_cancelamento_edicao_dias: int = 0
     ativo: bool = True
 
 class AreaCreate(AreaBase):

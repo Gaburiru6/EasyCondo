@@ -12,3 +12,15 @@ def criar_reserva(db: Session, reserva_data: ReservaCreate):
 def listar_reservas_por_morador(db: Session, morador_id: int):
     # Retorna todas as reservas de um morador específico
     return db.query(Reserva).filter(Reserva.morador_id == morador_id).all()
+
+def atualizar_reserva(db: Session, reserva_id: int, reserva_data: ReservaCreate):
+    reserva = db.query(Reserva).filter(Reserva.id == reserva_id).first()
+    if reserva:
+        # Atualiza apenas os campos que o morador pode editar
+        reserva.area_id = reserva_data.area_id
+        reserva.data_reserva = reserva_data.data_reserva
+        reserva.horario_inicio = reserva_data.horario_inicio
+        reserva.horario_fim = reserva_data.horario_fim
+        db.commit()
+        db.refresh(reserva)
+    return reserva

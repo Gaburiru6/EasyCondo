@@ -94,7 +94,7 @@ async function carregarAreas() {
             <tr class="border-b ${!isAtivo ? 'opacity-60 bg-slate-50' : ''}">
                 <td class="py-4 font-semibold text-slate-800">${area.nome} ${statusBadge}</td>
                 <td class="py-4 text-slate-600">${area.possui_taxa ? 'R$ ' + area.taxa : 'Grátis'}</td>
-                <td class="py-4 text-slate-600">S: ${area.limite_semanal} / M: ${area.limite_mensal}</td>
+                <td class="py-4 text-slate-600">S: ${area.limite_semanal} / M: ${area.limite_mensal} / C: ${area.limite_cancelamento_edicao_dias}</td>
                 <td class="py-4 text-right space-x-4">
                     <button onclick="preencherFormulario(${area.id})" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition">Editar</button>
                     ${actionBtn}
@@ -115,6 +115,7 @@ function preencherFormulario(id) {
     document.getElementById("taxa").value = area.taxa;
     document.getElementById("limite_semanal").value = area.limite_semanal;
     document.getElementById("limite_mensal").value = area.limite_mensal;
+    document.getElementById("limite_cancelamento_edicao_dias").value = area.limite_cancelamento_edicao_dias || 0;
 
     document.getElementById("btnSalvar").innerText = "Atualizar Área";
     document.getElementById("btnSalvar").classList.replace("w-full", "w-2/3");
@@ -141,6 +142,7 @@ document.getElementById("formArea").addEventListener("submit", async (e) => {
         taxa: parseFloat(document.getElementById("taxa").value) || 0,
         limite_semanal: parseInt(document.getElementById("limite_semanal").value) || 0,
         limite_mensal: parseInt(document.getElementById("limite_mensal").value) || 0,
+        limite_cancelamento_edicao_dias: parseInt(document.getElementById("limite_cancelamento_edicao_dias").value) || 0,
         ativo: true
     };
 

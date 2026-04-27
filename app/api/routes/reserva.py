@@ -1,5 +1,5 @@
 # Arquivo: app/api/routes/reserva.py
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from app.api.deps import get_db
@@ -16,3 +16,10 @@ def criar(data: ReservaCreate, db: Session = Depends(get_db)):
 @router.get("/morador/{morador_id}", response_model=List[ReservaResponse])
 def listar_do_morador(morador_id: int, db: Session = Depends(get_db)):
     return reserva_service.listar_reservas_por_morador(db, morador_id)
+
+@router.put("/{reserva_id}", response_model=ReservaResponse)
+def atualizar(reserva_id: int, data: ReservaCreate, db: Session = Depends(get_db)):
+    reserva = reserva_service.atualizar_reserva(db, reserva_id, data)
+    if not reserva:
+        raise HTTPException(status_code=404, detail="Reserva não encontrada")
+    return reserva
