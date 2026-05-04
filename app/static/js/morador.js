@@ -29,8 +29,31 @@ function showToast(message, type = "success") {
 // ==========================================
 const MORADOR_ID_SIMULADO = 1;
 let areasCache = {}; 
-let reservasCache = {}; // Novo cache para as reservas
+let reservasCache = {};
 
+// ==========================================
+// FUNÇÃO DE CONFLITO (FORA DO SUBMIT)
+// ==========================================
+function temConflito(novaInicio, novaFim, data, areaId, reservaEditandoId = null) {
+    return Object.values(reservasCache).some(r => {
+        if (r.data_reserva !== data) return false;
+        if (r.area_id != areaId) return false;
+
+        if (reservaEditandoId && r.id == reservaEditandoId) return false;
+
+        const inicioExistente = r.horario_inicio.substring(0,5);
+        const fimExistente = r.horario_fim.substring(0,5);
+
+        return (
+            novaInicio < fimExistente &&
+            novaFim > inicioExistente
+        );
+    });
+}
+
+// ==========================================
+// CARREGAMENTO
+// ==========================================
 async function carregarAreasNoSelect() {
     try {
         const res = await fetch("/api/area/?t=" + new Date().getTime()); 
@@ -46,13 +69,13 @@ async function carregarAreasNoSelect() {
             areasCache[area.id] = area;
             
             if (isAtivo) {
-                select.innerHTML += `<option value="${area.id}">${area.nome} ${area.possui_taxa ? '(R$ ' + area.taxa + ')' : '(Grátis)'}</option>`;
+                select.innerHTML += `<option value="${area.id}">${area.nome}</option>`;
             }
         });
 
         carregarMinhasReservas();
     } catch (error) {
-        showToast("Erro ao carregar lista de áreas.", "error");
+        showToast("Erro ao carregar áreas.", "error");
     }
 }
 
@@ -61,143 +84,93 @@ async function carregarMinhasReservas() {
         const res = await fetch(`/api/reserva/morador/${MORADOR_ID_SIMULADO}`);
         const reservas = await res.json();
         const container = document.getElementById("listaReservas");
-        const contador = document.getElementById("contadorReservas");
 
         if (!container) return;
 
         container.innerHTML = "";
-        reservasCache = {}; // Limpa o cache a cada carregamento
-
-        if (contador) contador.innerText = `${reservas.length} Agendadas`;
-
-        if (reservas.length === 0) {
-            container.innerHTML = `<p class="text-center text-slate-500 py-8">Você ainda não tem reservas agendadas.</p>`;
-            return;
-        }
+        reservasCache = {};
 
         reservas.forEach(r => {
-            reservasCache[r.id] = r; // Salva a reserva no cache para edição
-
-            const areaInfo = areasCache[r.area_id];
-            const nomeArea = areaInfo ? areaInfo.nome : `Área Desconhecida (ID: ${r.area_id})`;
+            reservasCache[r.id] = r;
 
             container.innerHTML += `
-                <div class="p-6 rounded-lg border border-slate-100 hover:bg-surface-container-low transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center flex-shrink-0">
-                            <span class="material-symbols-outlined text-primary">event</span>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-on-surface">${nomeArea}</h4>
-                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-on-surface-variant mt-1">
-                                <span class="flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-[18px]">calendar_month</span>
-                                    ${r.data_reserva}
-                                </span>
-                                <span class="flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-[18px]">schedule</span>
-                                    ${r.horario_inicio} - ${r.horario_fim}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <button onclick="editarReserva(${r.id})" class="text-blue-600 hover:text-blue-800 font-bold text-sm transition">Editar</button>
-                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">${r.status}</span>
-                    </div>
+                <div>
+                    ${r.data_reserva} - ${r.horario_inicio} até ${r.horario_fim}
                 </div>
             `;
         });
+
     } catch (error) {
-        showToast("Erro ao carregar suas reservas.", "error");
+        showToast("Erro ao carregar reservas.", "error");
     }
 }
 
 // ==========================================
-// FUNÇÕES DE EDIÇÃO
-// ==========================================
-function editarReserva(id) {
-    const r = reservasCache[id];
-    if (!r) return;
-
-    // Preenche os campos do formulário
-    const inputReservaId = document.getElementById("reserva_id");
-    if(inputReservaId) inputReservaId.value = r.id;
-
-    document.getElementById("area").value = r.area_id;
-    document.getElementById("data").value = r.data_reserva;
-    document.getElementById("inicio").value = r.horario_inicio.substring(0, 5); // Ex: "10:00:00" -> "10:00"
-    document.getElementById("fim").value = r.horario_fim.substring(0, 5);
-
-    // Ajusta os botões visuais
-    const btnSalvar = document.getElementById("btnSalvar");
-    const btnCancelar = document.getElementById("btnCancelar");
-
-    if (btnSalvar) {
-        btnSalvar.innerText = "Atualizar Reserva";
-        btnSalvar.classList.replace("w-full", "w-2/3");
-    }
-    if (btnCancelar) {
-        btnCancelar.classList.remove("hidden");
-    }
-    
-    // Rola a tela suavemente para o topo onde está o formulário
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function cancelarEdicao() {
-    const form = document.getElementById("reservaForm");
-    if(form) form.reset();
-
-    const inputReservaId = document.getElementById("reserva_id");
-    if(inputReservaId) inputReservaId.value = "";
-
-    const btnSalvar = document.getElementById("btnSalvar");
-    const btnCancelar = document.getElementById("btnCancelar");
-
-    if (btnSalvar) {
-        btnSalvar.innerText = "Confirmar Reserva";
-        btnSalvar.classList.replace("w-2/3", "w-full");
-    }
-    if (btnCancelar) {
-        btnCancelar.classList.add("hidden");
-    }
-}
-
-// ==========================================
-// SUBMISSÃO DO FORMULÁRIO (CRIAÇÃO/EDIÇÃO)
+// SUBMIT (COM TODAS AS VALIDAÇÕES)
 // ==========================================
 const form = document.getElementById("reservaForm");
+
 if (form) {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const areaId = document.getElementById("area").value;
-        if (!areaId) {
-            showToast("Por favor, selecione uma área.", "error");
-            return;
-        }
+        const dataReserva = document.getElementById("data").value;
+        const inicio = document.getElementById("inicio").value;
+        const fim = document.getElementById("fim").value;
 
         const inputReservaId = document.getElementById("reserva_id");
         const reservaId = inputReservaId ? inputReservaId.value : "";
 
-        // O backend (FastAPI/Time) exige formato HH:MM:SS. Se o input devolver HH:MM, adicionamos os segundos
-        let hor_inicio = document.getElementById("inicio").value;
-        let hor_fim = document.getElementById("fim").value;
-        if (hor_inicio.length === 5) hor_inicio += ":00";
-        if (hor_fim.length === 5) hor_fim += ":00";
+        // =============================
+        // VALIDAÇÕES
+        // =============================
+        if (!areaId) {
+            showToast("Selecione uma área.", "error");
+            return;
+        }
+
+        if (!dataReserva) {
+            showToast("Informe a data.", "error");
+            return;
+        }
+
+        if (!inicio || !fim) {
+            showToast("Preencha os horários.", "error");
+            return;
+        }
+
+        if (inicio === fim) {
+            showToast("Horários não podem ser iguais.", "error");
+            return;
+        }
+
+        if (inicio > fim) {
+            showToast("Início deve ser menor que o fim.", "error");
+            return;
+        }
+
+        if (temConflito(inicio, fim, dataReserva, areaId, reservaId)) {
+            showToast("Já existe reserva nesse horário.", "error");
+            return;
+        }
+
+        // =============================
+        // FORMATAÇÃO
+        // =============================
+        let hor_inicio = inicio.length === 5 ? inicio + ":00" : inicio;
+        let hor_fim = fim.length === 5 ? fim + ":00" : fim;
 
         const data = {
             area_id: parseInt(areaId),
             morador_id: MORADOR_ID_SIMULADO,
-            data_reserva: document.getElementById("data").value,
-            horario_inicio: hor_inicio, 
+            data_reserva: dataReserva,
+            horario_inicio: hor_inicio,
             horario_fim: hor_fim,
-            status: "CONFIRMADA", 
-            valor_pago: 0.0 
+            status: "CONFIRMADA",
+            valor_pago: 0.0
         };
 
-        // Define a rota e o método HTTP dependendo se estamos criando ou editando
         const url = reservaId ? `/api/reserva/${reservaId}` : "/api/reserva/";
         const method = reservaId ? "PUT" : "POST";
 
@@ -209,18 +182,20 @@ if (form) {
             });
 
             if (res.ok) {
-                showToast(reservaId ? "Reserva atualizada com sucesso!" : "Reserva confirmada com sucesso!", "success");
-                cancelarEdicao(); // Limpa e restaura a visualização do formulário
+                showToast("Reserva salva com sucesso!", "success");
+                form.reset();
                 carregarMinhasReservas();
             } else {
                 const erro = await res.json();
-                showToast("Erro ao processar: " + (erro.detail || "Verifique os dados"), "error");
+                showToast(erro.detail || "Erro ao salvar.", "error");
             }
-        } catch (error) {
-            showToast("Erro de comunicação com o servidor.", "error");
+        } catch {
+            showToast("Erro de conexão.", "error");
         }
     });
 }
 
-// Inicia a aplicação carregando os dados
+// ==========================================
+// INIT
+// ==========================================
 carregarAreasNoSelect();
