@@ -17,5 +17,8 @@ class ReservaCreate(ReservaBase):
 class ReservaResponse(ReservaBase):
     id: int
 
+    area_nome: str | None = None
+    morador_nome: str | None = None
+
     class Config:
         from_attributes = True

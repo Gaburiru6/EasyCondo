@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 import os
 
-from app.api.routes import auth, solicitacao, area, reserva, dashboard
+from app.api.routes import auth, solicitacao, area, reserva, dashboard, sindico
 from app.api.pages import (
     auth_page,
     sindico_page,
@@ -35,6 +35,7 @@ app.include_router(solicitacao.router)
 app.include_router(area.router)
 app.include_router(reserva.router)
 app.include_router(dashboard.router)
+app.include_router(sindico.router)
 
 # PAGES
 app.include_router(auth_page.router)

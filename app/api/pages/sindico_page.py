@@ -50,3 +50,16 @@ def reservas_page(request: Request):
         name="sindico/reservas.html",
         context={}
     )
+
+
+@router.get("/moradores")
+def moradores_page(request: Request):
+    redirecionamento = _garantir_sindico_logado(request)
+    if redirecionamento:
+        return redirecionamento
+
+    return templates.TemplateResponse(
+        request=request,
+        name="sindico/moradores.html",
+        context={}
+    )

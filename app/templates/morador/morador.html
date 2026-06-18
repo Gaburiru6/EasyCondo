@@ -188,11 +188,77 @@
                     </div>
 
                     <div id="listaHorariosDisponiveis" class="mt-4 grid max-h-[420px] grid-cols-2 gap-3 overflow-y-auto pr-1 sm:grid-cols-3 xl:grid-cols-4"></div>
+
+                    <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="text-sm font-semibold text-slate-700 mb-2">Seleção de horário</p>
+                        <p id="intervaloSelecionado" class="text-sm text-slate-600 mb-4">Escolha o horário de início e de fim clicando nos blocos acima.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="btnConfirmarIntervalo" type="button" onclick="confirmarIntervaloModal()" class="rounded-xl bg-primary text-white px-4 py-3 disabled:opacity-50" disabled>Confirmar intervalo</button>
+                            <button id="btnLimparIntervalo" type="button" onclick="limparSelecaoIntervalo()" class="rounded-xl border border-slate-300 bg-white text-slate-700 px-4 py-3">Limpar seleção</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="/static/js/morador.js"></script>
+    <div id="modalPagamento" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-sm">
+        <div class="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl border border-outline-variant/15">
+            <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                <div>
+                    <h3 class="text-xl font-bold font-manrope text-on-surface">Pagamento da reserva</h3>
+                    <p class="text-sm text-on-surface-variant">Escaneie o QR-CODE fictício para simular o pagamento.</p>
+                </div>
+                <button type="button" onclick="fecharModalPagamento()" class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <p class="text-sm font-semibold text-slate-700 mb-2">Valor da taxa</p>
+                <p id="textoValorPagamento" class="text-2xl font-extrabold text-primary mb-4">R$ 0,00</p>
+
+                <div class="mx-auto mb-5 h-56 w-56 rounded-xl border border-slate-300 bg-white p-3">
+                    <div class="h-full w-full rounded-lg"
+                        style="background-image:
+                            linear-gradient(90deg, #111 25%, transparent 25%),
+                            linear-gradient(#111 25%, transparent 25%),
+                            linear-gradient(90deg, transparent 75%, #111 75%),
+                            linear-gradient(transparent 75%, #111 75%);
+                            background-size: 24px 24px;
+                            background-position: 0 0, 0 0, 0 0, 0 0;"></div>
+                </div>
+
+                <div class="flex flex-wrap justify-end gap-2">
+                    <button type="button" onclick="fecharModalPagamento()" class="rounded-xl border border-slate-300 bg-white text-slate-700 px-4 py-3">Cancelar</button>
+                    <button type="button" onclick="pagarReservaModal()" class="rounded-xl bg-primary text-white px-4 py-3 font-bold">Pagar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalCancelamento" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-sm">
+        <div class="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl border border-outline-variant/15">
+            <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                <div>
+                    <h3 class="text-xl font-bold font-manrope text-on-surface">Confirmar cancelamento</h3>
+                    <p class="text-sm text-on-surface-variant">Tem certeza de que deseja cancelar esta reserva?</p>
+                </div>
+                <button type="button" onclick="fecharModalCancelamento()" class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <p class="text-sm text-slate-600 mb-5">Essa ação não poderá ser desfeita.</p>
+                <div class="flex flex-wrap justify-end gap-2">
+                    <button type="button" onclick="fecharModalCancelamento()" class="rounded-xl border border-slate-300 bg-white text-slate-700 px-4 py-3">Voltar</button>
+                    <button type="button" onclick="confirmarCancelamentoModal()" class="rounded-xl bg-red-600 text-white px-4 py-3 font-bold hover:bg-red-700">Confirmar cancelamento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/morador.js?v=6"></script>
 </body>
 </html>

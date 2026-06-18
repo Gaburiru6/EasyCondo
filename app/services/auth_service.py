@@ -48,18 +48,40 @@ def register(db: Session, data):
             detail="EMAIL_EXISTS"
         )
 
+# verifica se é o primeiro usuário do sistema
+    total_usuarios = db.query(Usuario).count()
+
+    if total_usuarios == 0:
+        status = StatusUsuario.aprovado
+    else:
+        status = StatusUsuario.pendente
+
     novo_user = Usuario(
         nome=data.nome,
         email=data.email,
         senha=data.senha,
         apartamento=data.apartamento,
-        status=StatusUsuario.pendente
+        status=status
     )
 
     user_repository.criar(
         db,
         novo_user
     )
+
+    # se for o primeiro usuário, torna síndico automaticamente
+    if total_usuarios == 0:
+
+        sindico = Sindico(
+            id=novo_user.id
+        )
+
+        db.add(sindico)
+        db.commit()
+
+        return {
+            "msg": "Primeiro usuário cadastrado como síndico"
+        }
 
     return {
         "msg": "Cadastro enviado para aprovação"

@@ -37,6 +37,10 @@ let reservasCache = {};
 let todasReservasCondominio = [];
 let diasDisponiveisModal = [];
 let diaSelecionadoModal = "";
+let horarioInicioModal = null;
+let horarioFimModal = null;
+let reservaPagamentoSelecionadaId = null;
+let reservaCancelamentoSelecionadaId = null;
 
 function formatarMoeda(valor) {
     return new Intl.NumberFormat("pt-BR", {
@@ -85,10 +89,6 @@ function reservaPodeSerEditada(reserva, area) {
     const statusNormalizado = String(reserva.status || "").toUpperCase();
     if (statusNormalizado === "CANCELADA") return false;
 
-    if (area.possui_taxa === true || area.possui_taxa === 1) {
-        if (statusNormalizado === "CONFIRMADA") return false;
-    }
-
     return reservaDentroDoPrazoEdicaoECancelamento(reserva, area);
 }
 
@@ -112,6 +112,29 @@ function converterMinutosParaHora(minutos) {
     const horas = Math.floor(minutos / 60);
     const resto = minutos % 60;
     return `${String(horas).padStart(2, "0")}:${String(resto).padStart(2, "0")}`;
+}
+
+function intervaloEstaDisponivel(dia, inicio, fim) {
+    if (!dia || !inicio || !fim) return false;
+
+    const inicioMin = converterHoraParaMinutos(inicio);
+    const fimMin = converterHoraParaMinutos(fim);
+    const inicioIndex = dia.horarios.findIndex((horario) => horario.inicio === inicio);
+    const fimIndex = dia.horarios.findIndex((horario) => horario.inicio === fim);
+
+    if (inicioIndex === -1 || fimIndex === -1 || fimMin <= inicioMin) {
+        return false;
+    }
+
+    for (let index = inicioIndex; index < fimIndex; index += 1) {
+        const atual = dia.horarios[index];
+        const proximo = dia.horarios[index + 1];
+        if (!proximo || converterHoraParaMinutos(proximo.inicio) !== converterHoraParaMinutos(atual.fim)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 function obterReservaEditandoId() {
@@ -153,6 +176,10 @@ function abrirModalDisponibilidade() {
 
     const modal = document.getElementById("modalDisponibilidade");
     if (!modal) return;
+
+    horarioInicioModal = null;
+    horarioFimModal = null;
+    atualizarSelecaoIntervalo();
 
     atualizarTextoAreaModal();
     modal.classList.remove("hidden");
@@ -269,13 +296,7 @@ function iniciarEdicaoReserva(reservaId) {
     }
 }
 
-function confirmarCancelamentoReserva(reservaId) {
-    return confirm("Deseja cancelar esta reserva?");
-}
-
 async function cancelarReserva(reservaId) {
-    if (!confirmarCancelamentoReserva(reservaId)) return;
-
     try {
         const res = await fetch(`/api/reserva/${reservaId}/cancelar`, {
             method: "POST",
@@ -295,6 +316,37 @@ async function cancelarReserva(reservaId) {
     }
 }
 
+function abrirModalCancelamento(reservaId) {
+    reservaCancelamentoSelecionadaId = reservaId;
+
+    const modal = document.getElementById("modalCancelamento");
+    if (!modal) return;
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+function fecharModalCancelamento() {
+    reservaCancelamentoSelecionadaId = null;
+
+    const modal = document.getElementById("modalCancelamento");
+    if (!modal) return;
+
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+}
+
+async function confirmarCancelamentoModal() {
+    if (!reservaCancelamentoSelecionadaId) {
+        showToast("Nenhuma reserva selecionada para cancelamento.", "error");
+        return;
+    }
+
+    const reservaId = reservaCancelamentoSelecionadaId;
+    fecharModalCancelamento();
+    await cancelarReserva(reservaId);
+}
+
 function renderizarHorariosDoDia(dia) {
     const container = document.getElementById("listaHorariosDisponiveis");
     const contador = document.getElementById("contadorHorariosDisponiveis");
@@ -312,16 +364,40 @@ function renderizarHorariosDoDia(dia) {
     textoDia.innerText = formatarDataBr(dia.data);
     contador.innerText = `${dia.horarios.length} horários`;
 
-    container.innerHTML = dia.horarios.map((horario) => `
-        <button type="button" onclick="selecionarHorarioDisponivel('${dia.data}', '${horario.inicio}', '${horario.fim}')" class="rounded-xl border border-outline-variant/20 bg-surface-container-low px-3 py-3 text-left text-sm font-bold text-on-surface transition-all hover:border-primary/30 hover:bg-primary/5 hover:text-primary">
-            <span class="block text-xs font-medium text-on-surface-variant">Disponível</span>
-            <span>${horario.inicio} - ${horario.fim}</span>
-        </button>
-    `).join("");
+    const inicioRange = horarioInicioModal ? converterHoraParaMinutos(horarioInicioModal.inicio) : null;
+    const fimRange = horarioFimModal ? converterHoraParaMinutos(horarioFimModal.fim) : null;
+
+    container.innerHTML = dia.horarios.map((horario) => {
+        const inicioSlot = converterHoraParaMinutos(horario.inicio);
+        const isInicio = horarioInicioModal && horarioInicioModal.inicio === horario.inicio && horarioInicioModal.fim === horario.fim;
+        const isFim = horarioFimModal && horarioFimModal.inicio === horario.inicio && horarioFimModal.fim === horario.fim;
+        const isDentroDoIntervalo = inicioRange !== null && fimRange !== null && inicioSlot > inicioRange && inicioSlot < fimRange;
+
+        let classes = "rounded-xl border px-3 py-3 text-left text-sm font-bold transition-all ";
+        if (isInicio) {
+            classes += "border-blue-600 bg-blue-600 text-white";
+        } else if (isFim) {
+            classes += "border-slate-900 bg-slate-900 text-white";
+        } else if (isDentroDoIntervalo) {
+            classes += "border-blue-300 bg-blue-100 text-slate-700";
+        } else {
+            classes += "border-outline-variant/20 bg-surface-container-low text-on-surface hover:border-primary/30 hover:bg-primary/5 hover:text-primary";
+        }
+
+        return `
+            <button type="button" onclick="selecionarHorarioDisponivel('${dia.data}', '${horario.inicio}', '${horario.fim}')" class="${classes}">
+                <span class="block text-xs font-medium text-on-surface-variant">Disponível</span>
+                <span>${horario.inicio} - ${horario.fim}</span>
+            </button>
+        `;
+    }).join("");
 }
 
 function selecionarDiaDisponivel(data) {
     diaSelecionadoModal = data;
+    horarioInicioModal = null;
+    horarioFimModal = null;
+    atualizarSelecaoIntervalo();
     const dia = diasDisponiveisModal.find((item) => item.data === data) || null;
 
     const listaDias = document.getElementById("listaDiasDisponiveis");
@@ -364,16 +440,77 @@ function renderizarDiasDisponiveis() {
 }
 
 function selecionarHorarioDisponivel(data, inicio, fim) {
+    const inicioMin = converterHoraParaMinutos(inicio);
+    const inicioSelecionadoMin = horarioInicioModal ? converterHoraParaMinutos(horarioInicioModal.inicio) : null;
+
+    if (!horarioInicioModal || (horarioInicioModal && horarioFimModal)) {
+        horarioInicioModal = { inicio, fim };
+        horarioFimModal = null;
+    } else if (!horarioFimModal) {
+        if (inicioMin <= inicioSelecionadoMin) {
+            horarioInicioModal = { inicio, fim };
+            horarioFimModal = null;
+        } else {
+            const dia = diasDisponiveisModal.find((item) => item.data === data) || null;
+            if (intervaloEstaDisponivel(dia, horarioInicioModal.inicio, inicio)) {
+                horarioFimModal = { inicio, fim };
+            } else {
+                showToast("Intervalo inválido ou não contíguo. Escolha outro horário de fim.", "error");
+                horarioFimModal = null;
+            }
+        }
+    }
+
+    atualizarSelecaoIntervalo();
+    const dia = diasDisponiveisModal.find((item) => item.data === data) || null;
+    renderizarHorariosDoDia(dia);
+}
+
+function atualizarSelecaoIntervalo() {
+    const status = document.getElementById("intervaloSelecionado");
+    const btnConfirmar = document.getElementById("btnConfirmarIntervalo");
+    const btnLimpar = document.getElementById("btnLimparIntervalo");
+
+    if (!status || !btnConfirmar || !btnLimpar) return;
+
+    if (horarioInicioModal && horarioFimModal) {
+        status.innerText = `Intervalo selecionado: ${horarioInicioModal.inicio} - ${horarioFimModal.fim}`;
+        btnConfirmar.disabled = false;
+    } else if (horarioInicioModal) {
+        status.innerText = `Início selecionado: ${horarioInicioModal.inicio}. Clique em outro horário para definir o fim ou confirme para usar apenas este horário.`;
+        btnConfirmar.disabled = false;
+    } else {
+        status.innerText = "Selecione o horário de início e de fim clicando nos blocos acima.";
+        btnConfirmar.disabled = true;
+    }
+}
+
+function limparSelecaoIntervalo() {
+    horarioInicioModal = null;
+    horarioFimModal = null;
+    atualizarSelecaoIntervalo();
+    const dia = diasDisponiveisModal.find((item) => item.data === diaSelecionadoModal) || null;
+    renderizarHorariosDoDia(dia);
+}
+
+function confirmarIntervaloModal() {
     const campoData = document.getElementById("data");
     const campoInicio = document.getElementById("inicio");
     const campoFim = document.getElementById("fim");
 
-    if (campoData) campoData.value = data;
-    if (campoInicio) campoInicio.value = inicio;
-    if (campoFim) campoFim.value = fim;
+    if (!horarioInicioModal) {
+        showToast("Selecione pelo menos um horário de início.", "error");
+        return;
+    }
+
+    const fimSelecionado = horarioFimModal ? horarioFimModal.fim : horarioInicioModal.fim;
+
+    if (campoData) campoData.value = diaSelecionadoModal;
+    if (campoInicio) campoInicio.value = horarioInicioModal.inicio;
+    if (campoFim) campoFim.value = fimSelecionado;
 
     fecharModalDisponibilidade();
-    showToast("Horário aplicado ao formulário.", "success");
+    showToast("Intervalo aplicado ao formulário.", "success");
 
     const form = document.getElementById("reservaForm");
     if (form) {
@@ -470,9 +607,9 @@ async function carregarMinhasReservas() {
                     </div>
                     <div class="flex flex-wrap justify-end gap-2 pt-2 border-t border-slate-100 mt-1">
                         ${podeEditar ? `<button onclick="iniciarEdicaoReserva('${reserva.id}')" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg text-xs hover:bg-slate-300 transition-all">Editar</button>` : ""}
-                        ${podeCancelar ? `<button onclick="cancelarReserva('${reserva.id}')" class="px-4 py-2 bg-red-50 text-red-700 font-bold rounded-lg text-xs hover:bg-red-100 transition-all">Cancelar</button>` : ""}
+                        ${podeCancelar ? `<button onclick="abrirModalCancelamento('${reserva.id}')" class="px-4 py-2 bg-red-50 text-red-700 font-bold rounded-lg text-xs hover:bg-red-100 transition-all">Cancelar</button>` : ""}
                         ${statusNormalizado === "PENDENTE_PAGAMENTO"
-                            ? `<button onclick="confirmarPagamentoReserva('${reserva.id}')" class="px-4 py-2 bg-primary text-white font-bold rounded-lg text-xs hover:opacity-90 transition-all">Paguei</button>`
+                            ? `<button onclick="abrirModalPagamento('${reserva.id}', '${reserva.valor_pago || areaAtual?.taxa || 0}')" class="px-4 py-2 bg-primary text-white font-bold rounded-lg text-xs hover:opacity-90 transition-all">Pagar</button>`
                             : ""
                         }
                     </div>
@@ -530,6 +667,24 @@ if (form) {
         modalDisponibilidade.addEventListener("click", (event) => {
             if (event.target === modalDisponibilidade) {
                 fecharModalDisponibilidade();
+            }
+        });
+    }
+
+    const modalPagamento = document.getElementById("modalPagamento");
+    if (modalPagamento) {
+        modalPagamento.addEventListener("click", (event) => {
+            if (event.target === modalPagamento) {
+                fecharModalPagamento();
+            }
+        });
+    }
+
+    const modalCancelamento = document.getElementById("modalCancelamento");
+    if (modalCancelamento) {
+        modalCancelamento.addEventListener("click", (event) => {
+            if (event.target === modalCancelamento) {
+                fecharModalCancelamento();
             }
         });
     }
@@ -603,7 +758,7 @@ if (form) {
                 const reservaSalva = await res.json();
 
                 if (String(reservaSalva.status || "").toUpperCase() === "PENDENTE_PAGAMENTO") {
-                    showToast(`Reserva salva. Taxa pendente de ${formatarMoeda(reservaSalva.valor_pago)}. Clique em Paguei.`, "success");
+                    showToast(`Reserva salva. Taxa pendente de ${formatarMoeda(reservaSalva.valor_pago)}. Clique em Pagar.`, "success");
                 } else {
                     showToast("Reserva salva com sucesso!", "success");
                 }
@@ -639,6 +794,56 @@ async function confirmarPagamentoReserva(id) {
     }
 }
 
+function abrirModalPagamento(reservaId, valor) {
+    reservaPagamentoSelecionadaId = reservaId;
+
+    const modal = document.getElementById("modalPagamento");
+    const textoValor = document.getElementById("textoValorPagamento");
+
+    if (textoValor) {
+        textoValor.innerText = formatarMoeda(valor || 0);
+    }
+
+    if (!modal) return;
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+function fecharModalPagamento() {
+    reservaPagamentoSelecionadaId = null;
+    const modal = document.getElementById("modalPagamento");
+    if (!modal) return;
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+}
+
+async function pagarReservaModal() {
+    if (!reservaPagamentoSelecionadaId) {
+        showToast("Nenhuma reserva selecionada para pagamento.", "error");
+        return;
+    }
+
+    const id = reservaPagamentoSelecionadaId;
+
+    try {
+        const res = await fetch(`/api/reserva/${id}/paguei`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (res.ok) {
+            fecharModalPagamento();
+            showToast("Pagamento confirmado com sucesso!", "success");
+            await carregarMinhasReservas();
+        } else {
+            const erro = await res.json();
+            showToast(erro.detail || "Erro ao confirmar pagamento.", "error");
+        }
+    } catch {
+        showToast("Erro de conexão.", "error");
+    }
+}
+
 async function carregarSessaoMorador() {
     try {
         const response = await fetch("/auth/me");
@@ -646,11 +851,6 @@ async function carregarSessaoMorador() {
 
         if (!session.authenticated) {
             window.location.href = "/auth/login";
-            return false;
-        }
-
-        if (session.is_sindico) {
-            window.location.href = "/sindico/dashboard";
             return false;
         }
 

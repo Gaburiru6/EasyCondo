@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EasyCondo - Gestão de Moradores</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet" />
+<style>
+body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body>
+<aside class="hidden lg:flex h-screen w-64 fixed left-0 top-0 bg-slate-50 border-r flex-col p-4 space-y-2 z-50">
+    <div class="mb-8 px-2">
+        <h1 class="text-lg font-black text-blue-700">EasyCondo</h1>
+        <p class="text-xs text-slate-500">Portal do Síndico</p>
+    </div>
+
+    <nav class="flex-1 space-y-1">
+        <a href="/sindico/dashboard" class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:text-blue-600">
+            <span class="material-symbols-outlined">dashboard</span>
+            Dashboard
+        </a>
+        <a href="/sindico/area" class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:text-blue-600">
+            <span class="material-symbols-outlined">handyman</span>
+            Áreas
+        </a>
+        <a href="/sindico/reservas" class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:text-blue-600">
+            <span class="material-symbols-outlined">event_available</span>
+            Reservas
+        </a>
+        <a href="/sindico/moradores" class="flex items-center gap-3 px-3 py-2 bg-white text-blue-700 font-bold rounded-lg">
+            <span class="material-symbols-outlined">groups</span>
+            Moradores
+        </a>
+    </nav>
+</aside>
+
+<nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-3 z-50">
+    <a href="/sindico/dashboard" class="flex flex-col items-center text-slate-500">
+        <span class="material-symbols-outlined text-2xl">dashboard</span>
+        <span class="text-[10px]">Dash</span>
+    </a>
+    <a href="/sindico/area" class="flex flex-col items-center text-slate-500">
+        <span class="material-symbols-outlined text-2xl">handyman</span>
+        <span class="text-[10px]">Áreas</span>
+    </a>
+    <a href="/sindico/reservas" class="flex flex-col items-center text-slate-500">
+        <span class="material-symbols-outlined text-2xl">event_available</span>
+        <span class="text-[10px]">Reservas</span>
+    </a>
+    <a href="/sindico/moradores" class="flex flex-col items-center text-blue-700">
+        <span class="material-symbols-outlined text-2xl">groups</span>
+        <span class="text-[10px] font-bold">Moradores</span>
+    </a>
+</nav>
+
+<main class="lg:ml-64 p-6 pb-24 lg:pb-6">
+    <header class="mb-6">
+        <h2 class="text-3xl font-extrabold text-slate-900">Gestão de Moradores</h2>
+        <p class="text-sm text-slate-500">Pesquisa, ordenação e controle de permissões de síndico.</p>
+    </header>
+
+    <section class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <div class="md:col-span-2">
+                <label for="buscaNome" class="text-xs font-semibold text-slate-600">Pesquisar por nome</label>
+                <input id="buscaNome" type="text" placeholder="Digite o nome" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" />
+            </div>
+            <div>
+                <label for="ordenarPor" class="text-xs font-semibold text-slate-600">Ordenar por</label>
+                <select id="ordenarPor" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+                    <option value="nome">Nome</option>
+                    <option value="cadastro">Data de cadastro</option>
+                </select>
+            </div>
+            <div>
+                <label for="ordem" class="text-xs font-semibold text-slate-600">Ordem</label>
+                <select id="ordem" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+                    <option value="asc">Crescente</option>
+                    <option value="desc">Decrescente</option>
+                </select>
+            </div>
+            <div>
+                <label for="pageSize" class="text-xs font-semibold text-slate-600">Itens por página</label>
+                <select id="pageSize" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wide">
+                    <tr>
+                        <th class="px-4 py-3">ID</th>
+                        <th class="px-4 py-3">Nome</th>
+                        <th class="px-4 py-3">Email</th>
+                        <th class="px-4 py-3">Apartamento</th>
+                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Perfil</th>
+                        <th class="px-4 py-3 text-right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyMoradores" class="divide-y divide-slate-100"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer class="mt-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div id="paginacaoInfo" class="text-sm text-slate-600"></div>
+        <div class="flex items-center gap-2">
+            <button id="btnPaginaAnterior" class="px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm">Anterior</button>
+            <span id="paginaAtual" class="text-sm font-semibold text-slate-700">1</span>
+            <button id="btnProximaPagina" class="px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm">Próxima</button>
+        </div>
+    </footer>
+</main>
+
+<script>
+let pagina = 1;
+let totalPaginas = 1;
+let debounceId = null;
+
+function showMessage(message) {
+    alert(message);
+}
+
+function obterFiltros() {
+    return {
+        nome: document.getElementById('buscaNome').value.trim(),
+        ordenar_por: document.getElementById('ordenarPor').value,
+        ordem: document.getElementById('ordem').value,
+        page_size: parseInt(document.getElementById('pageSize').value, 10)
+    };
+}
+
+async function carregarMoradores() {
+    const filtros = obterFiltros();
+    const params = new URLSearchParams({
+        nome: filtros.nome,
+        ordenar_por: filtros.ordenar_por,
+        ordem: filtros.ordem,
+        page: String(pagina),
+        page_size: String(filtros.page_size)
+    });
+
+    const tbody = document.getElementById('tbodyMoradores');
+    tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-4 text-sm text-slate-500">Carregando...</td></tr>';
+
+    try {
+        const res = await fetch(`/sindicos/moradores?${params.toString()}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+            tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-4 text-sm text-red-600">${data?.detail || 'Erro ao carregar moradores.'}</td></tr>`;
+            return;
+        }
+
+        const items = data.items || [];
+        totalPaginas = data.total_pages || 1;
+
+        tbody.innerHTML = '';
+        items.forEach((morador) => {
+            const acao = morador.is_sindico
+                ? `<button onclick="rebaixarSindico(${morador.id})" class="px-3 py-1 rounded bg-red-50 text-red-700 text-xs font-semibold">Rebaixar</button>`
+                : `<button onclick="promoverSindico(${morador.id})" class="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold">Promover</button>`;
+
+            tbody.innerHTML += `
+                <tr>
+                    <td class="px-4 py-3 text-sm">${morador.id}</td>
+                    <td class="px-4 py-3 text-sm font-semibold text-slate-800">${morador.nome}</td>
+                    <td class="px-4 py-3 text-sm">${morador.email}</td>
+                    <td class="px-4 py-3 text-sm">${morador.apartamento || '-'}</td>
+                    <td class="px-4 py-3 text-sm">${morador.status}</td>
+                    <td class="px-4 py-3 text-sm">${morador.is_sindico ? 'Síndico' : 'Morador'}</td>
+                    <td class="px-4 py-3 text-sm text-right">${acao}</td>
+                </tr>
+            `;
+        });
+
+        if (items.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-4 text-sm text-slate-500">Nenhum usuário encontrado.</td></tr>';
+        }
+
+        document.getElementById('paginaAtual').innerText = String(data.page || 1);
+        document.getElementById('paginacaoInfo').innerText = `Total: ${data.total || 0} registros`;
+
+        document.getElementById('btnPaginaAnterior').disabled = pagina <= 1;
+        document.getElementById('btnPaginaAnterior').classList.toggle('opacity-50', pagina <= 1);
+
+        const semProxima = pagina >= totalPaginas;
+        document.getElementById('btnProximaPagina').disabled = semProxima;
+        document.getElementById('btnProximaPagina').classList.toggle('opacity-50', semProxima);
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-4 text-sm text-red-600">Erro de conexão ao carregar moradores.</td></tr>';
+    }
+}
+
+async function promoverSindico(id) {
+    const res = await fetch(`/sindicos/promover/${id}`, { method: 'POST' });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+        showMessage(data?.detail || 'Erro ao promover usuário.');
+        return;
+    }
+
+    showMessage('Usuário promovido com sucesso.');
+    carregarMoradores();
+}
+
+async function rebaixarSindico(id) {
+    const res = await fetch(`/sindicos/rebaixar/${id}`, { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+        showMessage(data?.detail || 'Erro ao rebaixar síndico.');
+        return;
+    }
+
+    showMessage('Síndico rebaixado com sucesso.');
+    carregarMoradores();
+}
+
+document.getElementById('buscaNome').addEventListener('input', () => {
+    clearTimeout(debounceId);
+    debounceId = setTimeout(() => {
+        pagina = 1;
+        carregarMoradores();
+    }, 250);
+});
+
+document.getElementById('ordenarPor').addEventListener('change', () => {
+    pagina = 1;
+    carregarMoradores();
+});
+
+document.getElementById('ordem').addEventListener('change', () => {
+    pagina = 1;
+    carregarMoradores();
+});
+
+document.getElementById('pageSize').addEventListener('change', () => {
+    pagina = 1;
+    carregarMoradores();
+});
+
+document.getElementById('btnPaginaAnterior').addEventListener('click', () => {
+    if (pagina > 1) {
+        pagina -= 1;
+        carregarMoradores();
+    }
+});
+
+document.getElementById('btnProximaPagina').addEventListener('click', () => {
+    if (pagina < totalPaginas) {
+        pagina += 1;
+        carregarMoradores();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', carregarMoradores);
+</script>
+</body>
+</html>

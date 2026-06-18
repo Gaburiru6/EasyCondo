@@ -64,6 +64,24 @@ def _aplicar_regra_taxa(reserva: Reserva, area) -> None:
         reserva.valor_pago = 0.0
 
 
+def _aplicar_regra_taxa_em_edicao(
+    reserva: Reserva,
+    area,
+    status_anterior
+) -> None:
+    if not area.possui_taxa:
+        reserva.status = StatusReserva.confirmada
+        reserva.valor_pago = 0.0
+        return
+
+    if status_anterior == StatusReserva.confirmada:
+        reserva.status = StatusReserva.confirmada
+        reserva.valor_pago = float(area.taxa or reserva.valor_pago or 0.0)
+        return
+
+    _aplicar_regra_taxa(reserva, area)
+
+
 def _validar_prazo_cancelamento_edicao(reserva: Reserva, area, acao: str) -> None:
     dias_limite = int(area.limite_cancelamento_edicao_dias or 0)
     dias_para_reserva = (reserva.data_reserva - date.today()).days
@@ -75,9 +93,12 @@ def _validar_prazo_cancelamento_edicao(reserva: Reserva, area, acao: str) -> Non
         )
 
     if dias_limite > 0 and dias_para_reserva < dias_limite:
+        detalhe = f"Não é possível {acao} esta reserva com menos de {dias_limite} dia(s) de antecedência."
+        if area.possui_taxa and reserva.status == StatusReserva.confirmada:
+            detalhe += " Para editar ou cancelar após esse prazo, é necessário pagar a multa."
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Não é possível {acao} esta reserva com menos de {dias_limite} dia(s) de antecedência."
+            detail=detalhe
         )
 
 
@@ -86,12 +107,6 @@ def _validar_edicao_reserva(reserva: Reserva, area) -> None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Não é possível editar uma reserva cancelada."
-        )
-
-    if area.possui_taxa and reserva.status == StatusReserva.confirmada:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Reservas pagas não podem ser editadas."
         )
 
     _validar_prazo_cancelamento_edicao(reserva, area, "editar")
@@ -159,7 +174,7 @@ def listar_reservas_por_morador(
 def listar_todas_reservas_ativas_do_condominio(
     db: Session
 ):
-    return reserva_repository.listar_todas_ativas(db)
+    return reserva_repository.listar_todas_ativas_com_nomes(db)
 
 
 def atualizar_reserva(
@@ -202,13 +217,17 @@ def atualizar_reserva(
         reserva_id
     )
 
+    status_anterior = reserva.status
+
     # Atualiza apenas os campos permitidos
 
     reserva.area_id = reserva_data.area_id
     reserva.data_reserva = reserva_data.data_reserva
     reserva.horario_inicio = reserva_data.horario_inicio
     reserva.horario_fim = reserva_data.horario_fim
-    _aplicar_regra_taxa(reserva, area)
+
+    # Em edição dentro do prazo, uma reserva já paga não deve voltar para pendente.
+    _aplicar_regra_taxa_em_edicao(reserva, area, status_anterior)
 
     return reserva_repository.salvar(
         db,
